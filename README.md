@@ -127,7 +127,10 @@ func startServer() error {
 Output shows the full chain with context from each wrap:
 
 ```
-database initialization failed: failed to read config: config file missing [/path/to/server.go:12 in main.readConfig] [/path/to/server.go:17 in main.initDatabase] [/path/to/server.go:24 in main.startServer]
+database initialization failed: failed to read config: 
+config file missing [/path/to/server.go:12 in main.readConfig] 
+[/path/to/server.go:17 in main.initDatabase] 
+[/path/to/server.go:24 in main.startServer]
 ```
 
 ### Stupid inline chaining
@@ -147,7 +150,10 @@ func clusterfuck() error {
 Output:
 
 ```
-final layer of despair: second layer of shit: original fuckup [/path/to/file.go:42 in main.clusterfuck] [/path/to/file.go:41 in main.clusterfuck] [/path/to/file.go:40 in main.clusterfuck]
+final layer of despair: second layer of shit: original fuckup 
+[/path/to/file.go:42 in main.clusterfuck] 
+[/path/to/file.go:41 in main.clusterfuck] 
+[/path/to/file.go:40 in main.clusterfuck]
 ```
 
 ### Unwrapping errors
@@ -231,7 +237,9 @@ func processUserShitWithStupidNesting(userID int) error {
 When this clusterfuck fails, you get a beautiful trace:
 
 ```
-data fetching step failed: failed to fetch user data for user ID 42: connection timeout [main.go:15 in processUserShitWithStupidNesting.func2] [main.go:35 in processUserShitWithStupidNesting]
+data fetching step failed: failed to fetch user data for user ID 42: 
+connection timeout [main.go:15 in processUserShitWithStupidNesting.func2] 
+[main.go:35 in processUserShitWithStupidNesting]
 ```
 
 ### Ridiculously stupid chain of doom
@@ -283,7 +291,10 @@ func performStupidlyComplexOperation() error {
 Output when everything goes to hell:
 
 ```
-the entire fucking operation is fucked: step 4 said fuck this shit: step 3 is having a mental breakdown: step 2 couldn't handle step 1's bullshit: step 1 went to shit [main.go:42 in step1] [main.go:47 in step2] [main.go:53 in step3] [main.go:59 in step4] [main.go:65 in performStupidlyComplexOperation]
+the entire fucking operation is fucked: step 4 said fuck this shit: 
+step 3 is having a mental breakdown: step 2 couldn't handle step 1's bullshit: 
+step 1 went to shit [main.go:42 in step1] [main.go:47 in step2] 
+[main.go:53 in step3] [main.go:59 in step4] [main.go:65 in performStupidlyComplexOperation]
 ```
 
 This shit makes debugging actually bearable instead of wanting to throw your laptop out the fucking window.
