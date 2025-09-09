@@ -38,7 +38,7 @@ func TestNew(t *testing.T) {
 			actual := New(tc.message)
 			require.NotNil(t, actual)
 
-			var actualErr *ErrorWithContext
+			var actualErr *CTXError
 
 			require.True(t, errors.As(actual, &actualErr))
 			require.Equal(t, tc.message, actualErr.message)
@@ -106,7 +106,7 @@ func TestWrap(t *testing.T) { //nolint:funlen
 
 			require.NotNil(t, actual)
 
-			var actualErr *ErrorWithContext
+			var actualErr *CTXError
 
 			require.True(t, errors.As(actual, &actualErr))
 			require.Equal(t, tc.message, actualErr.message)
@@ -136,12 +136,12 @@ func TestErrorWithContextError(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		err           *ErrorWithContext
+		err           *CTXError
 		expectedParts []string
 	}{
 		{
 			name: "with wrapped error",
-			err: &ErrorWithContext{
+			err: &CTXError{
 				err:      baseErr,
 				message:  "context message",
 				file:     "test.go",
@@ -158,7 +158,7 @@ func TestErrorWithContextError(t *testing.T) {
 		},
 		{
 			name: "without wrapped error",
-			err: &ErrorWithContext{
+			err: &CTXError{
 				message:  "standalone message",
 				file:     "test.go",
 				line:     42,
@@ -214,7 +214,7 @@ func TestErrorUnwrapping(t *testing.T) {
 	require.True(t, errors.Is(wrapped, baseErr))
 
 	// Test As functionality
-	var contextErr *ErrorWithContext
+	var contextErr *CTXError
 
 	require.True(t, errors.As(doubleWrapped, &contextErr))
 	require.Equal(t, "second wrap", contextErr.message)
@@ -285,7 +285,7 @@ func TestWrapf(t *testing.T) { //nolint:funlen
 
 			require.NotNil(t, actual)
 
-			var actualErr *ErrorWithContext
+			var actualErr *CTXError
 
 			require.True(t, errors.As(actual, &actualErr))
 
