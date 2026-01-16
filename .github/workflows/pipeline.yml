@@ -10,3 +10,4 @@ jobs:
       dep_command: "make dep"
       lint_command: "make lint"
       test_command: "make test-coverage"
+      is_vendored: true
