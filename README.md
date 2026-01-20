@@ -48,7 +48,7 @@ This package automatically captures where your errors happen in your code. No mo
 - **Wrap()** - Wraps existing errors with additional context and location
 - **Wrapf()** - Like Wrap() but with printf-style formatting because we're not animals
 
-All functions return an `*ErrorWithContext` that implements the standard `error` interface and supports `errors.Unwrap()`, `errors.Is()`, and `errors.As()` because Go's error handling conventions aren't completely ass-backwards.
+All functions return a `*CTXError` that implements the standard `error` interface and supports `errors.Unwrap()`, `errors.Is()`, and `errors.As()` because Go's error handling conventions aren't completely ass-backwards.
 
 ## Usage
 
@@ -170,10 +170,10 @@ if errors.Is(err, someSpecificError) {
     // handle it
 }
 
-// Or use errors.As() to get the ErrorWithContext
-var ctxErr *ctxerrors.ErrorWithContext
+// Or use errors.As() to check if it's a CTXError
+var ctxErr *ctxerrors.CTXError
 if errors.As(err, &ctxErr) {
-    fmt.Printf("Error occurred in %s at line %d\n", ctxErr.funcName, ctxErr.line)
+    fmt.Println("Got a CTXError:", ctxErr.Error())
 }
 ```
 
