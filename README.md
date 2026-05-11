@@ -29,6 +29,7 @@ A Go library that wraps errors with context information (file, line, function) b
 - [More stupid fucking examples](#more-stupid-fucking-examples)
   - [Annoyingly complex tangled bullshit](#annoyingly-complex-tangled-bullshit)
   - [Ridiculously stupid chain of doom](#ridiculously-stupid-chain-of-doom)
+- [Error mapping](#error-mapping)
 - [License](#license)
 - [Why?](#why)
 
@@ -47,6 +48,7 @@ This package automatically captures where your errors happen in your code. No mo
 - **New()** - Creates a new error with location context
 - **Wrap()** - Wraps existing errors with additional context and location
 - **Wrapf()** - Like Wrap() but with printf-style formatting because we're not animals
+- **SetErrorMap() / MapError() / ClearErrorMap()** - Translate foreign sentinel errors (gorm, sql, redis...) into your own business errors at wrap time. See [Error mapping](#error-mapping).
 
 All functions return a `*CTXError` that implements the standard `error` interface and supports `errors.Unwrap()`, `errors.Is()`, and `errors.As()` because Go's error handling conventions aren't completely ass-backwards.
 
@@ -298,6 +300,54 @@ step 1 went to shit [main.go:42 in step1] [main.go:47 in step2]
 ```
 
 This shit makes debugging actually bearable instead of wanting to throw your laptop out the fucking window.
+
+## Error mapping
+
+Stop foreign errors from leaking through your layers. Register a translation
+map at startup and `Wrap`/`Wrapf` will swap matching driver errors for your
+own business errors before wrapping.
+
+```go
+package main
+
+import (
+    "errors"
+
+    "github.com/psyb0t/ctxerrors"
+    "gorm.io/gorm"
+)
+
+var (
+    ErrNotFound      = errors.New("not found")
+    ErrAlreadyExists = errors.New("already exists")
+)
+
+func init() {
+    ctxerrors.SetErrorMap(map[error]error{
+        gorm.ErrRecordNotFound: ErrNotFound,
+        gorm.ErrDuplicatedKey:  ErrAlreadyExists,
+    })
+}
+
+func GetUser(id int) error {
+    err := db.First(&user, id).Error // returns gorm.ErrRecordNotFound
+    if err != nil {
+        // wrapped err satisfies errors.Is(err, ErrNotFound) — gorm.ErrRecordNotFound is gone
+        return ctxerrors.Wrap(err, "get user")
+    }
+    return nil
+}
+```
+
+API:
+
+- `SetErrorMap(map[error]error)` — replace the whole map.
+- `MapError(from, to error)` — add/overwrite a single entry (good for `init()` per package).
+- `ClearErrorMap()` — wipe it (mostly for tests).
+
+Matching uses `errors.Is`, so already-wrapped foreign errors still translate.
+Translation is single-pass — no chained `A→B→C`. nil keys/values are ignored.
+If no entry matches, behavior is unchanged.
 
 ## License
 
