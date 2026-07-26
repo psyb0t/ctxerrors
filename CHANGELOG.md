@@ -6,13 +6,10 @@ explicitly), patch bumps are docs / build / fixes only.
 
 ## v0.3.1 — 2026-07-26
 
-Coverage reporting to Codecov + README badges.
+README badges.
 
-- **Codecov coverage upload.** `pipeline.yml` enables the reusable workflow's
-  Codecov step; `make test-coverage` keeps `coverage.txt` (previously deleted
-  on exit) so CI can upload it.
-- **README badges.** pkg.go.dev reference + GitHub Actions CI status badges. No
-  library code changed.
+- pkg.go.dev reference + GitHub Actions CI status badges. No library code
+  changed.
 
 ## v0.3.0 — 2026-05-11
 
