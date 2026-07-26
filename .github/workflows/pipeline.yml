@@ -11,6 +11,3 @@ jobs:
       lint_command: "make lint"
       test_command: "make test-coverage"
       is_vendored: true
-      codecov_enabled: true
-    secrets:
-      codecov_token: ${{ secrets.CODECOV_TOKEN }}
