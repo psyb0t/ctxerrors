@@ -1,5 +1,8 @@
 # ctxerrors
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/psyb0t/ctxerrors.svg)](https://pkg.go.dev/github.com/psyb0t/ctxerrors)
+[![CI](https://img.shields.io/github/actions/workflow/status/psyb0t/ctxerrors/pipeline.yml?branch=main)](https://github.com/psyb0t/ctxerrors/actions/workflows/pipeline.yml)
+
 ```
  ####  ##### #    # ###### #####  #####   ####  #####   ####  
 #    #   #    #  #  #      #    # #    # #    # #    # #      
