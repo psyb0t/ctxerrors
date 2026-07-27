@@ -963,11 +963,6 @@ golang.org/x/text/width
 # golang.org/x/tools v0.39.1-0.20251205192105-907593008619
 ## explicit; go 1.24.0
 golang.org/x/tools/go/analysis
-golang.org/x/tools/go/analysis/checker
-golang.org/x/tools/go/analysis/internal
-golang.org/x/tools/go/analysis/internal/analysisflags
-golang.org/x/tools/go/analysis/internal/checker
-golang.org/x/tools/go/analysis/multichecker
 golang.org/x/tools/go/analysis/passes/appends
 golang.org/x/tools/go/analysis/passes/asmdecl
 golang.org/x/tools/go/analysis/passes/assign
@@ -995,7 +990,6 @@ golang.org/x/tools/go/analysis/passes/inspect
 golang.org/x/tools/go/analysis/passes/internal/ctrlflowinternal
 golang.org/x/tools/go/analysis/passes/loopclosure
 golang.org/x/tools/go/analysis/passes/lostcancel
-golang.org/x/tools/go/analysis/passes/modernize
 golang.org/x/tools/go/analysis/passes/nilfunc
 golang.org/x/tools/go/analysis/passes/nilness
 golang.org/x/tools/go/analysis/passes/pkgfact
@@ -1019,7 +1013,6 @@ golang.org/x/tools/go/analysis/passes/unsafeptr
 golang.org/x/tools/go/analysis/passes/unusedresult
 golang.org/x/tools/go/analysis/passes/unusedwrite
 golang.org/x/tools/go/analysis/passes/waitgroup
-golang.org/x/tools/go/analysis/unitchecker
 golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/go/ast/edge
 golang.org/x/tools/go/ast/inspector
@@ -1036,23 +1029,17 @@ golang.org/x/tools/go/types/typeutil
 golang.org/x/tools/imports
 golang.org/x/tools/internal/aliases
 golang.org/x/tools/internal/analysis/analyzerutil
-golang.org/x/tools/internal/analysis/driverutil
 golang.org/x/tools/internal/analysis/typeindex
 golang.org/x/tools/internal/astutil
-golang.org/x/tools/internal/astutil/free
 golang.org/x/tools/internal/cfginternal
-golang.org/x/tools/internal/diff
-golang.org/x/tools/internal/diff/lcs
 golang.org/x/tools/internal/event
 golang.org/x/tools/internal/event/core
 golang.org/x/tools/internal/event/keys
 golang.org/x/tools/internal/event/label
-golang.org/x/tools/internal/facts
 golang.org/x/tools/internal/fmtstr
 golang.org/x/tools/internal/gcimporter
 golang.org/x/tools/internal/gocommand
 golang.org/x/tools/internal/gopathwalk
-golang.org/x/tools/internal/goplsexport
 golang.org/x/tools/internal/imports
 golang.org/x/tools/internal/modindex
 golang.org/x/tools/internal/moreiters
@@ -1067,9 +1054,6 @@ golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/typesinternal/typeindex
 golang.org/x/tools/internal/versions
 golang.org/x/tools/refactor/satisfy
-# golang.org/x/tools/gopls v0.21.0
-## explicit; go 1.25
-golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize
 # google.golang.org/protobuf v1.36.6
 ## explicit; go 1.22
 google.golang.org/protobuf/encoding/prototext

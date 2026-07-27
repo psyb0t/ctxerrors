@@ -4,6 +4,15 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.3.3 — 2026-07-27
+
+Go 1.26 + lint tooling (`modernize` → built-in `go fix`).
+
+- Bumped the `go` directive to 1.26 (`go.mod` + CI).
+- `make lint` / `make lint-fix` now use Go 1.26's built-in `go fix` (`-diff`
+  check in `lint`, apply in `lint-fix`) instead of the `modernize` analyzer, and
+  the `modernize` tool directive is dropped from `go.mod`. No library code changed.
+
 ## v0.3.2 — 2026-07-27
 
 Self-hosted README badges.
