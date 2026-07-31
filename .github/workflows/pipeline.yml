@@ -10,8 +10,6 @@ jobs:
       dep_command: "make dep"
       lint_command: "make lint"
       test_command: "make test-coverage"
-      # Nothing here is generated, so there is no codegen to drift.
-      generate_command: "-"
       is_vendored: true
       coverage_file: "coverage-percent.txt"
 

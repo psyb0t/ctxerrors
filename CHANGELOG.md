@@ -4,6 +4,15 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.4.2 — 2026-07-31
+
+CI only, no library change.
+
+- Drops the `generate_command: "-"` opt-out the pipeline picked up in `v0.4.1`.
+  The shared Go workflow's codegen-drift gate is now off unless a repo asks for
+  it, so the explicit opt-out no longer does anything and the comment beside it
+  described a mechanism that no longer exists.
+
 ## v0.4.1 — 2026-07-31
 
 CI only, no library change.
