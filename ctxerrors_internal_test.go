@@ -312,3 +312,75 @@ func TestWrapf(t *testing.T) { //nolint:funlen
 		})
 	}
 }
+
+func TestJoin(t *testing.T) {
+	funcName := "TestJoin"
+
+	first := errors.New("first")   //nolint:err113
+	second := errors.New("second") //nolint:err113
+
+	testCases := []struct {
+		name        string
+		errs        []error
+		expectNil   bool
+		wantMessage string
+	}{
+		{
+			name:      "no errors",
+			errs:      nil,
+			expectNil: true,
+		},
+		{
+			name:      "only nils",
+			errs:      []error{nil, nil},
+			expectNil: true,
+		},
+		{
+			name:        "one error",
+			errs:        []error{first},
+			wantMessage: "1 errors",
+		},
+		{
+			name:        "nils are not counted",
+			errs:        []error{nil, first, nil},
+			wantMessage: "1 errors",
+		},
+		{
+			name:        "several errors",
+			errs:        []error{first, second},
+			wantMessage: "2 errors",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := Join(tc.errs...)
+
+			if tc.expectNil {
+				require.NoError(t, actual)
+
+				return
+			}
+
+			require.Error(t, actual)
+
+			var actualErr *CTXError
+
+			require.True(t, errors.As(actual, &actualErr))
+			require.Equal(t, tc.wantMessage, actualErr.message)
+
+			// Capturing the call site is the whole reason to join through
+			// this package rather than the standard library.
+			require.Contains(t, actualErr.funcName, funcName)
+			require.True(t, strings.HasSuffix(actualErr.file, goFileExtension))
+			require.NotZero(t, actualErr.line)
+
+			// Every joined error stays reachable through errors.Is.
+			for _, err := range tc.errs {
+				if err != nil {
+					require.ErrorIs(t, actual, err)
+				}
+			}
+		})
+	}
+}
