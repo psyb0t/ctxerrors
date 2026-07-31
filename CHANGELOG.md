@@ -4,6 +4,17 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.4.1 — 2026-07-31
+
+CI only, no library change.
+
+- The pipeline now passes `generate_command: "-"` to the shared Go workflow.
+  That workflow gained a codegen-drift gate which defaults to running
+  `make generate` and failing if the tree moves afterwards; this repo has no
+  generated files and no such target, so the job failed on `v0.4.0` and took
+  the GitHub Release step with it. `-` opts out explicitly. The `v0.4.0` tag
+  itself is fine and `go get` resolves it normally.
+
 ## v0.4.0 — 2026-07-31
 
 Adds `Join`, for operations that fan out and can fail in more than one place.
