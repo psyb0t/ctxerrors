@@ -4,6 +4,16 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.4.3 — 2026-08-01
+
+CI only, no library change.
+
+- Every branch and tag push is now mirrored to GitLab and Codeberg.
+- The default branch and tags are archived to the Wayback Machine and Software
+  Heritage, on push and monthly.
+- Issues opened on the mirrors are pulled back into GitHub every six hours.
+- Ignores a local `.telemetry/` scratch dir in git and Docker builds.
+
 ## v0.4.2 — 2026-07-31
 
 CI only, no library change.
