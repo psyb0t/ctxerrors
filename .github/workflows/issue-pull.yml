@@ -5,7 +5,7 @@ on:
   # account's crons together, so a shared minute is a thundering herd at both
   # mirrors every six hours.
   schedule:
-    - cron: "23 */6 * * *"
+    - cron: "19 */6 * * *"
   workflow_dispatch:
 
 jobs:
@@ -13,8 +13,6 @@ jobs:
     permissions:
       issues: write
     uses: psyb0t/reusable-github-workflows/.github/workflows/issue-pull.yml@master
-    with:
-      jitter_seconds: 0
     secrets:
       codeberg_token: ${{ secrets.CODEBERG_TOKEN }}
       gitlab_token: ${{ secrets.GITLAB_TOKEN }}
