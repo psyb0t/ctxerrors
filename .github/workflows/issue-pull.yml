@@ -13,6 +13,8 @@ jobs:
     permissions:
       issues: write
     uses: psyb0t/reusable-github-workflows/.github/workflows/issue-pull.yml@master
+    with:
+      jitter_seconds: 0
     secrets:
       codeberg_token: ${{ secrets.CODEBERG_TOKEN }}
       gitlab_token: ${{ secrets.GITLAB_TOKEN }}
