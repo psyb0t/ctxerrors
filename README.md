@@ -59,7 +59,7 @@ This package automatically captures where your errors happen in your code. No mo
 - **Join()** - Squashes a pile of errors into one that still knows where they got squashed. For when one thing fans out and several bits can shit the bed independently — three log sinks, a batch of rows, whatever. See [Joining errors](#joining-errors).
 - **SetErrorMap() / MapError() / ClearErrorMap()** - Translate foreign sentinel errors (gorm, sql, redis...) into your own business errors at wrap time. See [Error mapping](#error-mapping).
 
-All functions return a `*CTXError` that implements the standard `error` interface and supports `errors.Unwrap()`, `errors.Is()`, and `errors.As()` because Go's error handling conventions aren't completely ass-backwards.
+`New()`, `Wrap()`, `Wrapf()`, and `Join()` return a `*CTXError` that implements the standard `error` interface and supports `errors.Unwrap()`, `errors.Is()`, and `errors.As()` because Go's error handling conventions aren't completely ass-backwards. `SetErrorMap()`, `MapError()`, and `ClearErrorMap()` don't return anything — they just manage the translation map.
 
 ## Usage
 

@@ -4,6 +4,15 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.4.5 — 2026-08-08
+
+Documentation. No code change.
+
+- The README said "All functions return a `*CTXError`". Three of the seven
+  return nothing at all: `SetErrorMap`, `MapError` and `ClearErrorMap` manage the
+  translation map. Corrected to name the four that do — `New`, `Wrap`, `Wrapf`
+  and `Join` — and say what the other three are for.
+
 ## v0.4.4 — 2026-08-08
 
 CI only, no library change.
