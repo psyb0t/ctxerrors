@@ -4,6 +4,29 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.4.4 — 2026-08-08
+
+CI only, no library change.
+
+- Enabled the imported-by badge. The README gains a count linking to
+  `importers.md` on the `badges` branch — the repositories importing this
+  module, grouped, package counts descending, and flagged when the owner is not
+  `psyb0t`. Useful here specifically because this module has no stars and no
+  external importers, yet is imported by ~17 of my own: the number is a
+  blast-radius indicator for changes, not an adoption metric, and the list is
+  what makes that legible.
+- The pipeline now also runs on a weekly schedule so that count stays current.
+  Weekly rather than daily because pkg.go.dev's crawl lags publication by days —
+  a daily run would re-derive an unchanged number six extra times a week, each
+  one dragging the full test suite along, since the badges job needs the
+  coverage artifact. It refreshes the whole pipeline rather than the badges
+  alone because the badge publisher republishes only what a run produced, so a
+  badge-only job would delete the coverage, version and license badges.
+- The cron slot is derived from a hash of the repository name rather than
+  picked. GitHub cron has no randomness, so spreading has to be deterministic;
+  the scheduler is also best-effort and sheds load at popular times, which
+  round-numbered schedules land squarely in.
+
 ## v0.4.3 — 2026-08-01
 
 CI only, no library change.
