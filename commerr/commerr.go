@@ -24,6 +24,8 @@ var (
 	ErrInvalidValue     = errors.New("invalid value")
 	ErrTargetNotPointer = errors.New("target is not a pointer")
 	ErrCouldNotDecode   = errors.New("could not decode")
+	ErrValidationFailed = errors.New("validation failed")
+	ErrOutOfRange       = errors.New("out of range")
 
 	// Field & Data errors
 	ErrNilOutput                      = errors.New("output is nil")
@@ -40,7 +42,11 @@ var (
 	// Operation errors
 	ErrFetchFailed     = errors.New("fetch failed")
 	ErrParseFailed     = errors.New("parse failed")
+	ErrReadFailed      = errors.New("read failed")
 	ErrWriteFailed     = errors.New("write failed")
+	ErrOpenFailed      = errors.New("open failed")
+	ErrCloseFailed     = errors.New("close failed")
+	ErrExecFailed      = errors.New("exec failed")
 	ErrPublishFailed   = errors.New("publish failed")
 	ErrSubscribeFailed = errors.New("subscribe failed")
 	ErrDownloadFailed  = errors.New("download failed")
@@ -53,6 +59,10 @@ var (
 	ErrMigrationFailed = errors.New("migration failed")
 	ErrUnmarshalFailed = errors.New("unmarshal failed")
 	ErrMarshalFailed   = errors.New("marshal failed")
+
+	// Capability errors
+	ErrNotImplemented = errors.New("not implemented")
+	ErrUnsupported    = errors.New("unsupported")
 
 	// Process State errors
 	//
@@ -67,11 +77,21 @@ var (
 	ErrTerminated   = errors.New("terminated")
 	ErrKilled       = errors.New("killed")
 	ErrClosing      = errors.New("closing")
+	ErrClosed       = errors.New("closed")
 	ErrShuttingDown = errors.New("shutting down")
 	ErrCancelled    = errors.New("cancelled")
+	ErrNotReady     = errors.New("not ready")
+	ErrInvalidState = errors.New("invalid state")
+	ErrExpired      = errors.New("expired")
 
-	// API & HTTP errors
+	// Concurrency & Capacity errors
+	ErrLockHeld  = errors.New("lock held")
+	ErrConflict  = errors.New("conflict")
+	ErrExhausted = errors.New("exhausted")
+
+	// Access & API errors
 	ErrUnexpectedHTTPStatusCode = errors.New("unexpected http status code")
 	ErrNotAuthenticated         = errors.New("not authenticated")
+	ErrPermissionDenied         = errors.New("permission denied")
 	ErrRateLimited              = errors.New("rate limited")
 )
