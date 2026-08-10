@@ -4,6 +4,26 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.5.0 — 2026-08-10
+
+Adds `commerr`, a subpackage holding the common sentinel errors.
+
+- **`commerr`** ships the shared sentinel vocabulary — `ErrNotFound`,
+  `ErrAlreadyExists`, `ErrFetchFailed`, `ErrTimeout`, `ErrUnavailable`,
+  `ErrRateLimited`, and the rest — as plain `errors.New` values that survive any
+  number of `Wrap` layers under `errors.Is`. Full list in `commerr/commerr.go`.
+- These are the natural targets for `SetErrorMap`. The mapping example in the
+  README now maps gorm's driver errors into `commerr.ErrNotFound` /
+  `commerr.ErrAlreadyExists` rather than hand-declared locals, since the map and
+  its targets finally live in one module.
+- It is a subpackage, not the root package: importing `ctxerrors` for wrapping
+  alone does not compile `commerr`, so a consumer that only wants file/line
+  context pays nothing for the vocabulary.
+- These same sentinels are also published by `common-go/errors`. That package is
+  being turned into a thin, deprecated re-export of `commerr` — same error
+  values, so `errors.Is` holds across both import paths — so existing imports
+  keep working while the canonical home moves here.
+
 ## v0.4.5 — 2026-08-08
 
 Documentation. No code change.
