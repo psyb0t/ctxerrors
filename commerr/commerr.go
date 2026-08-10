@@ -89,9 +89,8 @@ var (
 	ErrConflict  = errors.New("conflict")
 	ErrExhausted = errors.New("exhausted")
 
-	// Access & API errors
-	ErrUnexpectedHTTPStatusCode = errors.New("unexpected http status code")
-	ErrNotAuthenticated         = errors.New("not authenticated")
-	ErrPermissionDenied         = errors.New("permission denied")
-	ErrRateLimited              = errors.New("rate limited")
+	// Access & rate-limit errors
+	ErrNotAuthenticated = errors.New("not authenticated")
+	ErrPermissionDenied = errors.New("permission denied")
+	ErrRateLimited      = errors.New("rate limited")
 )
