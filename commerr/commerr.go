@@ -1,8 +1,12 @@
-// Package commerr holds the common sentinel errors shared across services: the
-// vocabulary ctxerrors' error map translates foreign driver errors into, and
-// that callers match with errors.Is. Each is a plain comparable error, so
-// wrapping one with ctxerrors.Wrap keeps errors.Is(err, commerr.ErrX) true
-// through every layer.
+// Package commerr provides common, general-purpose sentinel errors — not-found,
+// already-exists, invalid-argument, timeout, unavailable, and the like — so any
+// Go code can return and match a shared one with errors.Is instead of
+// re-declaring the same errors in every package.
+//
+// Each is a plain errors.New value, so it survives any wrapping (fmt.Errorf's
+// %w, ctxerrors.Wrap, ...) — errors.Is(err, commerr.ErrX) stays true through
+// every layer, and any of them works as a target for ctxerrors.SetErrorMap
+// when translating a foreign driver error into a business sentinel.
 package commerr
 
 import "errors"

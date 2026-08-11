@@ -4,6 +4,18 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.7.1 — 2026-08-11
+
+Rewrites the `commerr` package doc comment. No code changed.
+
+- The old comment called commerr "the vocabulary ctxerrors' error map translates
+  foreign driver errors into" — implying it is the only set `SetErrorMap` can
+  target — and framed the sentinels as "shared across services", too narrow for a
+  public, general-purpose package. The new comment describes them as
+  general-purpose sentinels any Go code can return and match with `errors.Is`,
+  usable with any wrapping, and notes they work as `SetErrorMap` targets without
+  claiming to be the only ones.
+
 ## v0.7.0 — 2026-08-10
 
 Removes `commerr.ErrUnexpectedHTTPStatusCode` — it is HTTP-specific (61 → 60).
