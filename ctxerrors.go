@@ -128,7 +128,7 @@ func wrap(err error, message string, skip int) error {
 }
 
 // Unwrap retrieves the underlying error, if any. It is the original error,
-// never the error map's translation, which Is and As report instead.
+// never the error map's translation, which Is and As report as well.
 func (e *CTXError) Unwrap() error {
 	if e == nil {
 		return nil
@@ -159,16 +159,45 @@ func (e *CTXError) As(target any) bool {
 	return errors.As(e.mapped, target)
 }
 
-// Error returns the formatted error message, including file and function details.
+// Original returns the error passed to Wrap or Wrapf, before any error map
+// translation, or nil when e wraps nothing. Its message is never part of
+// Error() once a translation applied, so reach for it only when the raw
+// cause is really needed, for example in internal diagnostics.
+func (e *CTXError) Original() error {
+	if e == nil {
+		return nil
+	}
+
+	return e.err
+}
+
+// Mapped returns the error map's translation of the wrapped error, or nil
+// when no entry matched.
+func (e *CTXError) Mapped() error {
+	if e == nil {
+		return nil
+	}
+
+	return e.mapped
+}
+
+// Error returns the formatted error message, including file and function
+// details. When the error map translated the wrapped error, the message shows
+// the translation, not the original error.
 func (e *CTXError) Error() string {
 	if e == nil {
 		return ""
 	}
 
-	if e.err != nil {
+	shown := e.err
+	if e.mapped != nil {
+		shown = e.mapped
+	}
+
+	if shown != nil {
 		return fmt.Sprintf(
 			"%s: %s [%s:%d in %s]",
-			e.message, e.err, e.file, e.line, e.funcName,
+			e.message, shown, e.file, e.line, e.funcName,
 		)
 	}
 

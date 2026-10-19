@@ -137,8 +137,18 @@ func TestWrapWithMapping_KeepsTypedErrors(t *testing.T) {
 	require.Same(t, input, typed)
 
 	require.Same(t, input, errors.Unwrap(got))
-	require.Contains(t, got.Error(), "load user: typed: driver: foreign: record not found")
-	require.NotContains(t, got.Error(), errBusinessNotFound.Error())
+
+	// The message shows only the translation; the original stays reachable
+	// through the *CTXError accessors.
+	require.Contains(t, got.Error(), "load user: business: not found")
+	require.NotContains(t, got.Error(), "foreign: record not found")
+	require.NotContains(t, got.Error(), "typed:")
+
+	var ctxErr *CTXError
+	require.True(t, errors.As(got, &ctxErr))
+	require.Same(t, input, ctxErr.Original())
+	require.Equal(t, errBusinessNotFound, ctxErr.Mapped())
+	require.Contains(t, ctxErr.Original().Error(), "foreign: record not found")
 
 	// A second wrap keeps the typed error and the translation.
 	outer := Wrap(got, "handle request")
@@ -161,6 +171,37 @@ func TestWrapWithMapping_TypedTarget(t *testing.T) {
 
 	unmapped := Wrap(errUnrelated, "ctx")
 	require.False(t, errors.As(unmapped, &mapped))
+}
+
+func TestCTXError_OriginalAndMapped(t *testing.T) {
+	t.Cleanup(ClearErrorMap)
+
+	MapError(errForeignNotFound, errBusinessNotFound)
+
+	var ctxErr *CTXError
+
+	// Unmapped: the message and Original are the wrapped error, Mapped is nil.
+	require.True(t, errors.As(Wrap(errUnrelated, "ctx"), &ctxErr))
+	require.Same(t, errUnrelated, ctxErr.Original())
+	require.NoError(t, ctxErr.Mapped())
+	require.Contains(t, ctxErr.Error(), "ctx: unrelated boom")
+
+	// Mapped: the message shows the translation.
+	require.True(t, errors.As(Wrap(errForeignNotFound, "ctx"), &ctxErr))
+	require.Same(t, errForeignNotFound, ctxErr.Original())
+	require.Equal(t, errBusinessNotFound, ctxErr.Mapped())
+	require.Contains(t, ctxErr.Error(), "ctx: business: not found")
+	require.NotContains(t, ctxErr.Error(), "foreign")
+
+	// New wraps nothing.
+	require.True(t, errors.As(New("boom"), &ctxErr))
+	require.NoError(t, ctxErr.Original())
+	require.NoError(t, ctxErr.Mapped())
+
+	// A nil *CTXError is safe.
+	var nilErr *CTXError
+	require.NoError(t, nilErr.Original())
+	require.NoError(t, nilErr.Mapped())
 }
 
 func TestMapError(t *testing.T) {

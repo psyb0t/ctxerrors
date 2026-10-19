@@ -378,13 +378,24 @@ Matching uses `errors.Is`, so already-wrapped foreign errors still translate.
 Translation is single-pass — no chained `A→B→C`. nil keys/values are ignored.
 If no entry matches, behavior is unchanged.
 
-The translation is added, not swapped in. The wrapped error matches the mapped
-sentinel through `errors.Is`, and its original chain stays reachable:
-`errors.Unwrap` returns the original error, `errors.As` still finds your own
-typed errors in it, and `Error()` prints the original message. That matters when
-the foreign error sits inside one of your typed errors, say an `*ErrNotFound`
-with an HTTP status that wraps `sql.ErrNoRows`. Wrapping it keeps the
-`*ErrNotFound` findable, so the HTTP layer still answers 404.
+The translation is added, not swapped in. `errors.Is` and `errors.As` match the
+mapped sentinel and everything in the original chain, and `errors.Unwrap`
+returns the original error. That matters when the foreign error sits inside one
+of your typed errors, say an `*ErrNotFound` with an HTTP status that wraps
+`sql.ErrNoRows`. Wrapping it keeps the `*ErrNotFound` findable, so the HTTP layer
+still answers 404.
+
+`Error()` prints the mapped sentinel, never the original message, so driver
+details stay out of logs and responses. When you really need the raw cause, get
+the `*CTXError` and ask for it:
+
+```go
+var ctxErr *ctxerrors.CTXError
+if errors.As(err, &ctxErr) {
+    ctxErr.Original() // the error passed to Wrap, before translation
+    ctxErr.Mapped()   // the translation, nil when no entry matched
+}
+```
 
 ## Common sentinels
 

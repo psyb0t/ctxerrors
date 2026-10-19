@@ -4,6 +4,21 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.9.0 (2026-10-19)
+
+`Error()` shows the error map's translation again, and the original error is available on request.
+
+- **Behavior change.** When `Wrap`/`Wrapf` match an error map entry, `Error()`
+  prints the mapped sentinel instead of the original message, as it did before
+  v0.8.0. Driver and library error text no longer reaches logs or responses
+  through a translated error.
+- New `CTXError.Original()` returns the error passed to `Wrap`, before
+  translation, and `CTXError.Mapped()` returns the translation, or nil when no
+  entry matched. Get the `*CTXError` with `errors.As` to call them.
+- Unchanged from v0.8.0: `errors.Is` and `errors.As` match both the mapped
+  sentinel and the original chain, and `errors.Unwrap` returns the original
+  error.
+
 ## v0.8.0 (2026-10-19)
 
 The error map adds its translation instead of replacing the wrapped error.
