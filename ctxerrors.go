@@ -9,7 +9,11 @@ import (
 
 // CTXError holds the wrapped error and additional context.
 type CTXError struct {
-	err      error
+	err error
+	// mapped is the error map's translation of err, or nil when no entry
+	// matched. It sits beside err instead of replacing it, so the original
+	// chain stays reachable through errors.Is and errors.As.
+	mapped   error
 	message  string
 	file     string
 	line     int
@@ -111,12 +115,11 @@ func wrap(err error, message string, skip int) error {
 		return nil
 	}
 
-	err = translate(err)
-
 	file, line, funcName := getCallerInfo(skip)
 
 	return &CTXError{
 		err:      err,
+		mapped:   translate(err),
 		message:  message,
 		file:     file,
 		line:     line,
@@ -124,13 +127,36 @@ func wrap(err error, message string, skip int) error {
 	}
 }
 
-// Unwrap retrieves the underlying error, if any.
+// Unwrap retrieves the underlying error, if any. It is the original error,
+// never the error map's translation, which Is and As report instead.
 func (e *CTXError) Unwrap() error {
 	if e == nil {
 		return nil
 	}
 
 	return e.err
+}
+
+// Is reports whether the error map's translation of the wrapped error
+// matches target. errors.Is calls it before following Unwrap, so a wrapped
+// error matches both its translation and everything in its original chain.
+func (e *CTXError) Is(target error) bool {
+	if e == nil || e.mapped == nil {
+		return false
+	}
+
+	return errors.Is(e.mapped, target)
+}
+
+// As finds the first error in the error map's translation of the wrapped
+// error that matches target. errors.As falls back to the original chain
+// through Unwrap when this reports false.
+func (e *CTXError) As(target any) bool {
+	if e == nil || e.mapped == nil {
+		return false
+	}
+
+	return errors.As(e.mapped, target)
 }
 
 // Error returns the formatted error message, including file and function details.

@@ -4,6 +4,24 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.8.0 (2026-10-19)
+
+The error map adds its translation instead of replacing the wrapped error.
+
+- **Behavior change.** When `Wrap`/`Wrapf` match an error map entry, the
+  `*CTXError` keeps the original error and records the mapped one beside it.
+  `errors.Is(err, mapped)` holds as before. `errors.Is(err, original)` now also
+  holds, where it used to be false.
+- `errors.As` finds typed errors in the original chain again. Before, a typed
+  application error that wrapped a mapped foreign error was dropped: an
+  `*ErrNotFound` around `sql.ErrNoRows`, wrapped while `sql.ErrNoRows` was
+  mapped, stopped matching `errors.As`, so an HTTP layer keyed on that type
+  answered 500 instead of 404.
+- `errors.As` also finds a typed mapping target, through the new
+  `CTXError.As`; `CTXError.Is` checks the mapped sentinel the same way.
+- `errors.Unwrap` returns the original error, and `Error()` prints the
+  original message instead of the mapped sentinel's.
+
 ## v0.7.1 — 2026-08-11
 
 Rewrites the `commerr` package doc comment. No code changed.

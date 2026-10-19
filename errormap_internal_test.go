@@ -28,17 +28,17 @@ func TestWrapWithMapping(t *testing.T) {
 		wantNilWrap bool
 	}{
 		{
-			name:      "direct match swaps underlying err",
+			name:      "direct match adds the mapped err and keeps the original",
 			mappings:  map[error]error{errForeignNotFound: errBusinessNotFound},
 			input:     errForeignNotFound,
-			wantIs:    []error{errBusinessNotFound},
-			wantNotIs: []error{errForeignNotFound},
+			wantIs:    []error{errBusinessNotFound, errForeignNotFound},
+			wantNotIs: []error{errBusinessConflict},
 		},
 		{
 			name:     "chained match via errors.Is still translates",
 			mappings: map[error]error{errForeignNotFound: errBusinessNotFound},
 			input:    fmt.Errorf("driver: %w", errForeignNotFound),
-			wantIs:   []error{errBusinessNotFound},
+			wantIs:   []error{errBusinessNotFound, errForeignNotFound},
 		},
 		{
 			name:      "no match preserves original err",
@@ -60,8 +60,8 @@ func TestWrapWithMapping(t *testing.T) {
 				errForeignConflict: errBusinessConflict,
 			},
 			input:     errForeignConflict,
-			wantIs:    []error{errBusinessConflict},
-			wantNotIs: []error{errBusinessNotFound, errForeignConflict},
+			wantIs:    []error{errBusinessConflict, errForeignConflict},
+			wantNotIs: []error{errBusinessNotFound, errForeignNotFound},
 		},
 		{
 			name:        "nil input still returns nil",
@@ -98,6 +98,71 @@ func TestWrapWithMapping(t *testing.T) {
 	}
 }
 
+// typedError is an application error type that carries a foreign cause and
+// matches any other *typedError with errors.Is, the shape HTTP layers detect
+// with errors.As to pick a status code.
+type typedError struct {
+	inner error
+}
+
+func (e *typedError) Error() string { return "typed: " + e.inner.Error() }
+
+func (e *typedError) Unwrap() error { return e.inner }
+
+func (e *typedError) Is(target error) bool {
+	_, ok := target.(*typedError)
+
+	return ok
+}
+
+// mappedTypedError is a typed mapping target, found through errors.As.
+type mappedTypedError struct{}
+
+func (e *mappedTypedError) Error() string { return "mapped typed error" }
+
+func TestWrapWithMapping_KeepsTypedErrors(t *testing.T) {
+	t.Cleanup(ClearErrorMap)
+
+	MapError(errForeignNotFound, errBusinessNotFound)
+
+	input := &typedError{inner: fmt.Errorf("driver: %w", errForeignNotFound)}
+	got := Wrap(input, "load user")
+
+	require.True(t, errors.Is(got, errBusinessNotFound))
+	require.True(t, errors.Is(got, errForeignNotFound))
+	require.True(t, errors.Is(got, &typedError{}))
+
+	var typed *typedError
+	require.True(t, errors.As(got, &typed))
+	require.Same(t, input, typed)
+
+	require.Same(t, input, errors.Unwrap(got))
+	require.Contains(t, got.Error(), "load user: typed: driver: foreign: record not found")
+	require.NotContains(t, got.Error(), errBusinessNotFound.Error())
+
+	// A second wrap keeps the typed error and the translation.
+	outer := Wrap(got, "handle request")
+	require.True(t, errors.Is(outer, errBusinessNotFound))
+	require.True(t, errors.As(outer, &typed))
+	require.Same(t, input, typed)
+}
+
+func TestWrapWithMapping_TypedTarget(t *testing.T) {
+	t.Cleanup(ClearErrorMap)
+
+	target := &mappedTypedError{}
+	MapError(errForeignNotFound, target)
+
+	got := Wrap(errForeignNotFound, "ctx")
+
+	var mapped *mappedTypedError
+	require.True(t, errors.As(got, &mapped))
+	require.Same(t, target, mapped)
+
+	unmapped := Wrap(errUnrelated, "ctx")
+	require.False(t, errors.As(unmapped, &mapped))
+}
+
 func TestMapError(t *testing.T) {
 	testCases := []struct {
 		name      string
@@ -112,8 +177,8 @@ func TestMapError(t *testing.T) {
 			from:      errForeignNotFound,
 			to:        errBusinessNotFound,
 			input:     errForeignNotFound,
-			wantIs:    []error{errBusinessNotFound},
-			wantNotIs: []error{errForeignNotFound},
+			wantIs:    []error{errBusinessNotFound, errForeignNotFound},
+			wantNotIs: []error{errBusinessConflict},
 		},
 		{
 			name:   "nil from is no-op",
