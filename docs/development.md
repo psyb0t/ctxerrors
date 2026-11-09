@@ -36,10 +36,11 @@ The tests are internal (`package ctxerrors`) and live next to the code in `*_int
 
 ## CI
 
-[`.github/workflows/pipeline.yml`](https://github.com/psyb0t/ctxerrors/blob/main/.github/workflows/pipeline.yml) runs on pushes to `main`, on `v*` tags, once a week on a schedule, and by hand.
+[`.github/workflows/pipeline.yml`](https://github.com/psyb0t/ctxerrors/blob/main/.github/workflows/pipeline.yml) runs on pushes to any branch, on `v*` tags, once a week on a schedule, and by hand.
 
-- On `main`, the schedule and manual runs, the shared Go workflow runs `make lint`, `make test-coverage` and govulncheck, and the badges job then publishes the coverage, version, license and imported-by badges to the `badges` branch.
-- On a `v*` tag, the pipeline does not rerun the checks. It waits for the `main` run of the same commit to pass, cuts the GitHub release with the tag message as its notes, and refreshes the badges with the coverage from that `main` run.
+- On every branch push, the schedule and manual runs, the shared Go workflow runs `make lint`, `make test-coverage` and govulncheck.
+- When that run is on `main`, the badges job then publishes the coverage, version, license and imported-by badges to the `badges` branch.
+- On a `v*` tag, the pipeline does not rerun the checks. It waits for the `main` run of the same commit to pass, cuts the GitHub release with the tag message as its notes, and refreshes the badges with the coverage from that `main` run. The `main` run keeps its coverage artifact for one day, so a tag pushed later than that still gets its release, but the badges job fails.
 
 The weekly run exists for the imported-by badge, which pkg.go.dev updates on its own schedule.
 

@@ -6,7 +6,7 @@ name: pipeline
 # annotated tag message, and refreshes the badges with the main run's coverage.
 on:
   push:
-    branches: [main]
+    branches: ["**"]
     tags: ["v*"]
   # Refreshes the imported-by badge. WEEKLY, not daily: pkg.go.dev's crawl lags
   # publication by days, so a daily run would re-derive an unchanged number six

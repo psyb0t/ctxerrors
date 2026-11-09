@@ -4,6 +4,16 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.9.2 (2026-11-09)
+
+Fixes to the v0.9.1 docs and CI. No code changed.
+
+- CI runs lint, tests and govulncheck on pushes to every branch again, as it did before v0.9.1, so Dependabot and other branches get checked before they merge. Badges still publish only from `main`, and tags still release from the `main` run.
+- The tangled-closure and chain-of-doom examples on the Error output page are back to the full v0.9.0 code, including `processPermissions` and the comments v0.9.1 dropped. The chain-of-doom trace was taken from that code, so its line numbers did not match the shortened copy. The tangled-closure trace now shows the line the full code reports.
+- The development guide says a tag must follow its `main` run within a day for the badges job to find the coverage artifact.
+- Smaller doc fixes: `Unwrap` and `Original` on a `Join` result return the `errors.Join` value; the nil-wrap log line starts with a timestamp under the default handler; the file path in a trace is absolute unless you build with `-trimpath`; the unwrapping example names where `startServer` comes from; the error-mapping example declares `user`.
+- `.gitignore` covers `*.local.json` files and the local docs build output (both added in v0.9.1).
+
 ## v0.9.1 (2026-11-09)
 
 Documentation site, a reworked CI pipeline and funding links. No code changed.

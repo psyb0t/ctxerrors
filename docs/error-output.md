@@ -18,7 +18,7 @@ An error from `New()` has nothing wrapped, so it is just the message and the loc
 <message> [<file>:<line> in <function>]
 ```
 
-The file is the absolute path the Go compiler recorded for the source file, and the function is the fully qualified name from the runtime, such as `main.connectToDatabase` or `github.com/you/app/store.(*Repo).Get`. A single wrap looks like this:
+The file is the path the Go compiler recorded for the source file, absolute unless you build with `-trimpath`, and the function is the fully qualified name from the runtime, such as `main.connectToDatabase` or `github.com/you/app/store.(*Repo).Get`. A single wrap looks like this:
 
 ```
 failed to connect to database at localhost:5432: dial tcp [::1]:5432: connect: connection refused [/path/to/your/file.go:42 in main.connectToDatabase]
@@ -104,12 +104,31 @@ func processUserShitWithStupidNesting(userID int) error {
         return nil
     }
 
+    processPermissions := func(id int) error {
+        checkAdminRights := func() error {
+            if rand.Intn(2) == 0 {
+                return ctxerrors.New("user lacks admin privileges")
+            }
+            return nil
+        }
+
+        if err := checkAdminRights(); err != nil {
+            return ctxerrors.Wrapf(err, "permission check failed for user %d", id)
+        }
+        return nil
+    }
+
+    // Chain all this shit together
     if err := validateUser(userID); err != nil {
         return ctxerrors.Wrap(err, "user validation step failed")
     }
 
     if err := fetchUserData(userID); err != nil {
         return ctxerrors.Wrap(err, "data fetching step failed")
+    }
+
+    if err := processPermissions(userID); err != nil {
+        return ctxerrors.Wrap(err, "permission processing step failed")
     }
 
     return nil
@@ -121,7 +140,7 @@ When `fetchUserData` fails, the plain `errors.New` in the middle has no location
 ```
 data fetching step failed: failed to fetch user data for user ID 42: connection timeout
 [/path/to/main.go:20 in main.processUserShitWithStupidNesting.func2]
-[/path/to/main.go:32 in main.processUserShitWithStupidNesting]
+[/path/to/main.go:47 in main.processUserShitWithStupidNesting]
 ```
 
 ## Ridiculously stupid chain of doom
@@ -143,16 +162,22 @@ func performStupidlyComplexOperation() error {
                         // Rock bottom of this shitshow
                         return ctxerrors.New("step 1 went to shit")
                     }(); err != nil {
+                        // Step 2: electric boogaloo of failure
                         return ctxerrors.Wrap(err, "step 2 couldn't handle step 1's bullshit")
                     }
+                    // If we somehow made it this far, we're lying
                     return nil
                 }(); err != nil {
+                    // Step 3: the reckoning
                     return ctxerrors.Wrap(err, "step 3 is having a mental breakdown")
                 }
+                // Still pretending everything is fine
                 return nil
             }(); err != nil {
+                // Step 4: fuck it, we're done trying
                 return ctxerrors.Wrap(err, "step 4 said fuck this shit")
             }
+            // The calm before the storm
             return nil
         }(); err != nil {
             // The final boss of this clusterfuck
@@ -164,7 +189,7 @@ func performStupidlyComplexOperation() error {
 }
 ```
 
-The lines are right, every one of them. The function names are what Go gives anonymous functions after the compiler inlines them into each other, and it does not hold back. This is real output from Go 1.26, with the longest names cut short:
+Output when everything goes to hell, from Go 1.26 with the longest names cut short. The function names are what Go gives anonymous functions after the compiler inlines them into each other:
 
 ```
 the entire fucking operation is fucked: step 4 said fuck this shit: step 3 is having a mental breakdown: step 2 couldn't handle step 1's bullshit: step 1 went to shit
@@ -175,4 +200,4 @@ the entire fucking operation is fucked: step 4 said fuck this shit: step 3 is ha
 [/path/to/main.go:71 in main.performStupidlyComplexOperation.func1]
 ```
 
-Name your functions and the trace names them back. This shit makes debugging actually bearable instead of wanting to throw your laptop out the fucking window.
+This shit makes debugging actually bearable instead of wanting to throw your laptop out the fucking window.

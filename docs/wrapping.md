@@ -67,10 +67,10 @@ func connectToDatabase(host string, port int) error {
 
 ## Wrapping nil
 
-`Wrap(nil, ...)` and `Wrapf(nil, ...)` return nil, so a wrap on a happy path never invents an error. They also log it, because wrapping nil is almost always a bug in the caller. The log goes through the default `log/slog` logger at error level, with the message `Trying to wrap a nil error` and the file, line and function of the three frames above the call:
+`Wrap(nil, ...)` and `Wrapf(nil, ...)` return nil, so a wrap on a happy path never invents an error. They also log it, because wrapping nil is almost always a bug in the caller. The log goes through the default `log/slog` logger at error level, with the message `Trying to wrap a nil error` and the file, line and function of the three frames above the call. With the default handler, the line starts with a timestamp:
 
 ```
-ERROR Trying to wrap a nil error sourceFile1=/path/to/main.go:57 sourceFunc1=main.main sourceFile2=... sourceFunc2=... sourceFile3=... sourceFunc3=...
+2026/01/02 15:04:05 ERROR Trying to wrap a nil error sourceFile1=/path/to/main.go:57 sourceFunc1=main.main sourceFile2=... sourceFunc2=... sourceFile3=... sourceFunc3=...
 ```
 
 Point `slog.SetDefault()` at your own handler if you want that line in your log pipeline.
@@ -104,7 +104,7 @@ The result unwraps to the `errors.Join` value, so `errors.Is()` and `errors.As()
 
 ## Unwrapping errors
 
-You can unwrap the chain to get to the original error:
+You can unwrap the chain to get to the original error. This uses `startServer` from the [error chaining example](error-output.md#error-chaining):
 
 ```go
 err := startServer()

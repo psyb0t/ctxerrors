@@ -26,7 +26,8 @@ func init() {
 }
 
 func GetUser(id int) error {
-    err := db.First(&user, id).Error // returns gorm.ErrRecordNotFound
+    var user User
+    err := db.First(&user, id).Error // db is your *gorm.DB; returns gorm.ErrRecordNotFound
     if err != nil {
         // wrapped err satisfies errors.Is(err, commerr.ErrNotFound), and the
         // original gorm error is still in the chain

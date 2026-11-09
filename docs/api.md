@@ -51,8 +51,8 @@ Every method is safe to call on a nil `*CTXError`.
 | Method | Returns |
 | --- | --- |
 | `Error() string` | The formatted message described on [Error output](error-output.md). When the error map translated the wrapped error, the translation is printed instead of the original. Empty string on a nil receiver. |
-| `Unwrap() error` | The original wrapped error, never the translation. Nil for an error from `New`. |
+| `Unwrap() error` | The original wrapped error, never the translation. The `errors.Join` value for an error from `Join`. Nil for an error from `New`. |
 | `Is(target error) bool` | Whether the error map's translation matches `target` through `errors.Is`. False when nothing was translated. `errors.Is` then keeps going through `Unwrap`, so the original chain matches too. |
 | `As(target any) bool` | Whether the translation, or something in its chain, matches `target` through `errors.As`. False when nothing was translated. `errors.As` falls back to the original chain through `Unwrap`. |
-| `Original() error` | The error passed to `Wrap` or `Wrapf`, before translation. Nil for an error from `New`. |
+| `Original() error` | The error passed to `Wrap` or `Wrapf`, before translation. The `errors.Join` value for an error from `Join`. Nil for an error from `New`. |
 | `Mapped() error` | The error map's translation, or nil when no entry matched. |

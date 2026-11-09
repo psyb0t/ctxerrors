@@ -83,7 +83,7 @@ func writeToAllSinks(sinks []Sink, record Record) error {
 }
 ```
 
-[Wrapping errors](https://psyb0t.github.io/ctxerrors/wrapping/) covers every function, the nil handling and how `errors.Is`/`errors.As` see the result.
+[Wrapping errors](https://psyb0t.github.io/ctxerrors/wrapping/) covers `New`, `Wrap`, `Wrapf` and `Join`, the nil handling and how `errors.Is`/`errors.As` see the result.
 
 ## Error output
 
