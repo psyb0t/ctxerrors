@@ -4,6 +4,16 @@ All notable changes per release. Versions follow [semver](https://semver.org)
 pre-1.0 conventions: minor bumps may include breaking API changes (called out
 explicitly), patch bumps are docs / build / fixes only.
 
+## v0.9.1 (2026-11-09)
+
+Documentation site, a reworked CI pipeline and funding links. No code changed.
+
+- The full documentation now lives at https://psyb0t.github.io/ctxerrors/, built by GitHub Pages from `docs/`: wrapping, error output, error mapping, every `commerr` sentinel, an API reference and a development guide. The README is now a short summary that links to it.
+- Doc fixes found while moving the README. `New`, `Wrap`, `Wrapf` and `Join` return a plain `error` holding a `*CTXError`, not a `*CTXError`. `Wrap(nil)` and `Wrapf(nil)` return nil and log the call site through `log/slog`. The example traces show real output with fully qualified function names instead of invented short ones. When more than one error map entry matches, which one wins is undefined.
+- CI runs lint, tests and govulncheck only on pushes to `main`, the weekly schedule and manual runs. A `v*` tag waits for the `main` run of the same commit to pass, then cuts the GitHub release from the tag message and refreshes the badges with that run's coverage. Every job declares its own permissions.
+- The issue-pull workflow runs at hours of its own instead of the hours every repository shared.
+- Added `.github/FUNDING.yml` and a Sponsor section in the README.
+
 ## v0.9.0 (2026-10-19)
 
 `Error()` shows the error map's translation again, and the original error is available on request.

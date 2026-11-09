@@ -7,3 +7,5 @@ git-update.sh.debot
 plan.md
 coverage-percent.txt
 .telemetry/
+*.local.json
+.testing/

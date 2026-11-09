@@ -1,10 +1,16 @@
 name: pipeline
 
+# A Go library: no image, no binaries. Pushes to main run lint, tests and
+# govulncheck, then refresh the badges. A v* tag does not rerun the checks: it
+# waits for that commit's main run to succeed, cuts the GitHub release from the
+# annotated tag message, and refreshes the badges with the main run's coverage.
 on:
   push:
+    branches: [main]
+    tags: ["v*"]
   # Refreshes the imported-by badge. WEEKLY, not daily: pkg.go.dev's crawl lags
   # publication by days, so a daily run would re-derive an unchanged number six
-  # extra times a week — and because the badges job needs the coverage artifact,
+  # extra times a week, and because the badges job needs the coverage artifact,
   # every one of those drags the full test suite with it.
   #
   # It has to be the WHOLE pipeline rather than a badge-only job: the publish
@@ -14,7 +20,7 @@ on:
   # The slot is derived from a hash of the repo name rather than chosen: GitHub
   # cron has no randomness (no Jenkins-style `H`), so "random" has to be faked
   # deterministically or every repo picks the same round number. Scattering also
-  # dodges the scheduler's peak — GitHub queues cron runs best-effort and drops
+  # dodges the scheduler's peak: GitHub queues cron runs best-effort and drops
   # them under load, which bites hardest on the hour.
   #
   #   h=$(printf '%s' "<owner>/<repo>" | sha256sum | tr -d ' -')
@@ -23,8 +29,18 @@ on:
     - cron: "54 4 * * 5"
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
-  call-go-workflow:
+  code:
+    if: "!startsWith(github.ref, 'refs/tags/')"
+    permissions:
+      # The checks only read. go-workflow.yml also has a tag-only release job
+      # that requests contents: write; it never runs here (this job is skipped
+      # on tags), but GitHub checks every called job's permissions against this
+      # grant when the run starts, skipped jobs included, so the grant has to
+      # cover it.
+      contents: write
     uses: psyb0t/reusable-github-workflows/.github/workflows/go-workflow.yml@master
     with:
       go_version: "1.26"
@@ -34,12 +50,28 @@ jobs:
       is_vendored: true
       coverage_file: "coverage-percent.txt"
 
-  badges:
-    needs: [call-go-workflow]
-    if: github.ref_name == github.event.repository.default_branch || startsWith(github.ref, 'refs/tags/')
+  wait:
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      actions: read
+    uses: psyb0t/reusable-github-workflows/.github/workflows/wait-for-default-branch.yml@master
+
+  release:
+    needs: [wait]
+    if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
+    uses: psyb0t/reusable-github-workflows/.github/workflows/release-workflow.yml@master
+
+  # Tag runs read the coverage artifact from the main run they release.
+  badges:
+    needs: [code, wait]
+    if: "always() && ((github.ref_name == github.event.repository.default_branch && needs.code.result == 'success') || (startsWith(github.ref, 'refs/tags/') && needs.wait.result == 'success'))"
+    permissions:
+      contents: write
+      actions: read # cross-run coverage artifact download on tags
     uses: psyb0t/reusable-github-workflows/.github/workflows/create-badges.yml@master
     with:
       coverage: true
+      coverage_run_id: ${{ needs.wait.outputs.run_id }}
       importers: true
